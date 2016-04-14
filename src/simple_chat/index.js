@@ -12,13 +12,12 @@ class Channel extends events.EventEmitter {
         super();
         this.clients = {};
         this.aliases = {};
-        this.subscriptions = {};
         this.initializeListeners();
     }
 
     _createSubscriptionFunction(id) {
         return (senderId, message)=> {
-            if (id !== senderId) {
+            if (id !== senderId && this.clients[id]) {
                 this.clients[id].consumeMessage(this.formatMessage(senderId, `wrote: ${message}`));
             }
         }
@@ -41,15 +40,30 @@ class Channel extends events.EventEmitter {
             this.clients[id] = client;
             this.aliases[id] = client.alias;
             this.announceJoined(id);
-            this.subscriptions[id] = this._createSubscriptionFunction(id);
-            this.on('broadcast', this.subscriptions[id]);
+            this.on('broadcast', this._createSubscriptionFunction(id));
         });
+
+        this.on('leave', (id)=> {
+            const leaveMessage = this.formatMessage(id, 'left the channel');
+            delete this.clients[id];
+            delete this.aliases[id];
+            this.announceLeft(leaveMessage);
+        })
     }
 
     announceJoined(joinedId) {
+        this.announceToAll(this.formatMessage(joinedId, 'joined the channel'));
+    }
+
+    announceToAll(message) {
         _.forEach(this.clients, (client)=> {
-            client.consumeMessage(this.formatMessage(joinedId, 'joined the channel'));
-        })
+            client.consumeMessage(message);
+        });
+    }
+
+
+    announceLeft(leaveMessage) {
+        this.announceToAll(leaveMessage);
     }
 }
 
@@ -60,7 +74,7 @@ class Client {
         this._channel = channel;
         this._id = Client.createId(this._connection);
         this.joinChannel();
-        this.listenForData();
+        this.listenOnConnection();
     }
 
     get alias() {
@@ -75,10 +89,13 @@ class Client {
         return `${connection.remoteAddress}:${connection.remotePort}`;
     }
 
-    listenForData() {
+    listenOnConnection() {
         this._connection.on('data', (data)=> {
             data = ChatServer.purifyString(data);
             this._channel.emit('broadcast', this._id, data);
+        });
+        this._connection.on('end', ()=> {
+            this._channel.emit('leave', this._id)
         });
     }
 
