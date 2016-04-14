@@ -1,0 +1,6 @@
+[ignore]
+.*/app/.*
+[include]
+.*/src/.*
+[libs]
+[options]
