@@ -1,0 +1,2 @@
+siemka
+linijka dodatkowo

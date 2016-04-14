@@ -12,6 +12,7 @@ class Channel extends events.EventEmitter {
         super();
         this.clients = {};
         this.aliases = {};
+        this.subscriptions = {};
         this.initializeListeners();
     }
 
@@ -40,13 +41,16 @@ class Channel extends events.EventEmitter {
             this.clients[id] = client;
             this.aliases[id] = client.alias;
             this.announceJoined(id);
-            this.on('broadcast', this._createSubscriptionFunction(id));
+            this.subscriptions[id] = this._createSubscriptionFunction(id);
+            this.on('broadcast', this.subscriptions[id]);
         });
 
         this.on('leave', (id)=> {
             const leaveMessage = this.formatMessage(id, 'left the channel');
             delete this.clients[id];
             delete this.aliases[id];
+            this.removeListener('broadcast', this.subscriptions[id]);
+            delete this.subscriptions[id];
             this.announceLeft(leaveMessage);
         })
     }
@@ -94,7 +98,7 @@ class Client {
             data = ChatServer.purifyString(data);
             this._channel.emit('broadcast', this._id, data);
         });
-        this._connection.on('end', ()=> {
+        this._connection.on('close', ()=> {
             this._channel.emit('leave', this._id)
         });
     }

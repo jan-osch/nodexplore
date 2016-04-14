@@ -44,10 +44,10 @@ gulp.task('server', () => {
 gulp.task('restart', () => {
     if (!express) {
         run('server', ()=> {
-            express.start.bind(express)();
+            express.scanDirectory.bind(express)();
         });
     } else {
-        express.start.bind(express)();
+        express.scanDirectory.bind(express)();
     }
 });
 
