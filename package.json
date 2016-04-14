@@ -3,15 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "gulp build && node ./app/index.js"
+    "start": "gulp build && node ./app/index.js",
+    "flow": "flow; test $? -eq 0 -o $? -eq 2"
   },
   "dependencies": {
-    "lodash": "^4.7.0"
+    "lodash": "^4.7.0",
+    "moment": "^2.12.0"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-plugin-transform-flow-strip-types": "^6.7.0",
     "babel-preset-es2015-node5": "^1.2.0",
+    "flow-bin": "^0.23.0",
     "gulp": "^3.9.1",
     "gulp-live-server": "0.0.29",
     "gulp-shell": "^0.5.2",
