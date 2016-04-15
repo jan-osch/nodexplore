@@ -45,10 +45,10 @@ class FileWatcher extends events.EventEmitter {
     }
 
     watchDirectory() {
-        this.logStartWatching(this.pathToWatch);
+        FileWatcher.logStartWatching(this.pathToWatch);
         this.scanDirectory();
         fs.watch(this.pathToWatch, this.fileWatchingOptions, ()=> {
-            this.logChanged(this.pathToWatch);
+            FileWatcher.logChanged(this.pathToWatch);
             this.scanDirectory();
         });
     }
@@ -66,9 +66,9 @@ class FileWatcher extends events.EventEmitter {
 
     private watchFile(fileName:string) {
         var fileWithPath = path.join(this.pathToWatch, fileName);
-        this.logStartWatching(fileWithPath);
+        FileWatcher.logStartWatching(fileWithPath);
         fs.watch(fileWithPath, this.fileWatchingOptions, ()=> {
-            this.logChanged(fileName);
+            FileWatcher.logChanged(fileName);
             this.copyFileAndChangeNameToLowercase(fileName);
         })
     }
@@ -79,11 +79,11 @@ class FileWatcher extends events.EventEmitter {
         fs.createReadStream(sourceFileName).pipe(fs.createWriteStream(destinationFileName));
     }
 
-    private logStartWatching(fileName:string) {
+    private static logStartWatching(fileName:string) {
         console.log(`starting to watch ${fileName}`);
     }
 
-    private logChanged(fileName:string) {
+    private static logChanged(fileName:string) {
         console.log(`${fileName} has been changed`);
     }
 }
