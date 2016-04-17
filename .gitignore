@@ -3,3 +3,4 @@ app/
 *.js.js
 *.js.map
 twitter_keys.json
+src/twitter_sampler/data

@@ -19,7 +19,7 @@ class FunctionStringTransformStream extends Transform {
 }
 
 
-class DictionaryBuilder {
+class StreamJsonBuilder {
     constructor(sourcePath, destinationPath, transformStream) {
         this.sourcePath = sourcePath;
         this.destinationPath = destinationPath;
@@ -36,8 +36,8 @@ class DictionaryBuilder {
             this.transformStream.end('\n}', this.streamEncoding, callback);
         });
     }
-
 }
+
 function createTransformFunction(finishCharacter) {
     const endString = finishCharacter;
     let wroteLine = false;
@@ -59,10 +59,12 @@ const transformFromCSVToJsonLine = createTransformFunction('\n}');
 
 let csvToJsonTransformStream = new FunctionStringTransformStream(transformFromCSVToJsonLine, {encoding: 'utf-8'});
 
-
-let dictionaryBuilder = new DictionaryBuilder(
+let dictionaryBuilder = new StreamJsonBuilder(
     './data/slownikWydzwieku01.csv',
     './data/polish-dictionary.json',
     csvToJsonTransformStream);
 
 dictionaryBuilder.build();
+
+exports.FunctionStringTransformStream = FunctionStringTransformStream;
+exports.StreamJsonBuilder = StreamJsonBuilder;

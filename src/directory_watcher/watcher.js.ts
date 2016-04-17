@@ -1,4 +1,4 @@
-/// <reference path="./node.d.ts" />
+/// <reference path="./../../typescript-interfaces/node.d.ts" />
 import events = require('events');
 import fs = require('fs');
 import path  = require('path');

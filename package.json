@@ -22,6 +22,7 @@
     "gulp-live-server": "0.0.29",
     "gulp-shell": "^0.5.2",
     "gulp-watch": "^4.3.5",
+    "reach-deep": "^0.1.2",
     "rimraf": "^2.5.2",
     "run-sequence": "^1.1.5",
     "twitter": "^1.2.5"
