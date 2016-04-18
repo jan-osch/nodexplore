@@ -1,5 +1,5 @@
 /// <reference path="../../typescript-interfaces/node.d.ts" />
-import {ReadStream, WriteStream} from "fs";
+import {ReadStream} from "fs";
 import {Server, ServerRequest, ServerResponse} from "http";
 var http = require('http');
 var fs = require('fs');
@@ -35,35 +35,47 @@ class StaticFormContainer {
     }
 }
 
-class FileWriter {
+class FileContainer {
     currentFileId:number;
     directoryForUploads:string = __dirname + '/uploaded';
+    fileMap:Array<string>;
 
     constructor() {
         this.currentFileId = 0;
+        this.fileMap = [];
     }
 
-    getNewStream():WriteStream {
-        var stream:WriteStream = fs.createWriteStream(this.createPathForNewFile())
-        this.currentFileId += 1;
-        return stream;
+    getIdForNewFile(name:string):number {
+        this.fileMap[this.currentFileId] = `${this.directoryForUploads}/${name}`;
+        return this.currentFileId++;
     }
 
-    private createPathForNewFile():string {
-        return `${this.directoryForUploads}/${this.currentFileId}`;
+    getPathForId(id:number):string {
+        if (!this.isIdInContainer(id)) {
+            throw new Error('invalid id');
+        }
+        return this.fileMap[id];
+    }
+
+    isIdInContainer(id:number):boolean {
+        return id < this.fileMap.length && id >= 0;
+    }
+
+    getReadStreamForId(id:number):ReadStream {
+        return fs.createReadStream(this.getPathForId(id));
     }
 }
 
 class FileUploadServer {
     httpServer:Server;
-    fileWriter:FileWriter;
+    fileContainer:FileContainer;
     staticContainer:StaticFormContainer;
 
     constructor(port:number) {
         this.httpServer = http.createServer((req:ServerRequest, res:ServerResponse)=> {
             this.handleRequest(req, res);
         });
-        this.fileWriter = new FileWriter();
+        this.fileContainer = new FileContainer();
         this.staticContainer = new StaticFormContainer(__dirname + '/form.html', ()=> {
             this.httpServer.listen(port, ()=> {
                 console.log(`Server listening on port ${port}`);
@@ -73,6 +85,10 @@ class FileUploadServer {
 
     handleRequest(req:ServerRequest, res:ServerResponse) {
         if (req.method === 'GET') {
+            if (FileUploadServer.isFileRequest(req)) {
+                this.attemptToServeFile(req, res);
+                return;
+            }
             FileUploadServer.dispatchHttpResponse(res, 200, this.staticContainer.formContent);
         } else if (req.method === 'POST') {
             this.upload(req, res);
@@ -93,11 +109,28 @@ class FileUploadServer {
             FileUploadServer.dispatchHttpResponse(res, 400, 'Bad request');
             return;
         }
-        var form = new formidable.IncomingForm();
+        this.handleFileUploadForm(req, res);
+    }
 
+    private attemptToServeFile(req:ServerRequest, res:ServerResponse) {
+        var id = parseInt(req.url.slice(1));
+        if (!this.fileContainer.isIdInContainer(id)) {
+            FileUploadServer.dispatchHttpResponse(res, 404, 'Not found');
+            return;
+        }
+        this.fileContainer.getReadStreamForId(id).pipe(res);
+    }
+
+    private handleFileUploadForm(req:ServerRequest, res:ServerResponse) {
+        var form = new formidable.IncomingForm();
+        var fileId:number;
         form.on('progress', this.createNewProgressLoggingFunction(res));
+        form.on('fileBegin', (name, file)=> {
+            fileId = this.fileContainer.getIdForNewFile(file.name);
+            file.path = this.fileContainer.getPathForId(fileId);
+        });
         form.parse(req, () => {
-            res.end('upload complete!');
+            res.end(`upload complete! stored as: ${fileId}`);
         });
     }
 
@@ -113,6 +146,9 @@ class FileUploadServer {
         return 0 == type.indexOf('multipart/form-data');
     }
 
+    private static isFileRequest(req:ServerRequest):boolean {
+        return req.url != '/';
+    }
 }
 
 var myServer = new FileUploadServer(3000);

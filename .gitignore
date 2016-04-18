@@ -4,3 +4,4 @@ app/
 *.js.map
 twitter_keys.json
 src/twitter_sampler/data
+src/file_uploader/uploaded/
