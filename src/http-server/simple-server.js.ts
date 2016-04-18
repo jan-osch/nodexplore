@@ -39,7 +39,7 @@ function runPostRequest(host:string, path:string, body:string, callback:(ClientR
         method: 'POST',
         headers: {
             'Content-Type': 'text/plain',
-            'Content-Length': body.length
+            'Content-Length': Buffer.byteLength(body)
         }
     };
     let request:ClientRequest = http.request(options, callback);
@@ -59,7 +59,8 @@ function handleRequestSend(response:ClientResponse) {
         console.log(`BODY: ${chunk}`);
     });
     response.on('end', () => {
-        console.log('No more data in response.')
+        console.log('No more data in response.');
+        myServer.close();
     });
     response.on('error', traceErrorIfPresent);
 }
