@@ -90,20 +90,20 @@ interface Buffer extends NodeBuffer {}
  */
 declare var Buffer: {
     /**
-     * Allocates a new buffer containing the given {str}.
+     * Allocates a new keysBuffer containing the given {str}.
      *
-     * @param str String to store in buffer.
+     * @param str String to store in keysBuffer.
      * @param encoding encoding to use, optional.  Default is 'utf8'
      */
     new (str: string, encoding?: string): Buffer;
     /**
-     * Allocates a new buffer of {size} octets.
+     * Allocates a new keysBuffer of {size} octets.
      *
      * @param size count of octets to allocate.
      */
     new (size: number): Buffer;
     /**
-     * Allocates a new buffer containing the given {array} of octets.
+     * Allocates a new keysBuffer containing the given {array} of octets.
      *
      * @param array The octets to store.
      */
@@ -117,15 +117,15 @@ declare var Buffer: {
      */
     new (arrayBuffer: ArrayBuffer): Buffer;
     /**
-     * Allocates a new buffer containing the given {array} of octets.
+     * Allocates a new keysBuffer containing the given {array} of octets.
      *
      * @param array The octets to store.
      */
     new (array: any[]): Buffer;
     /**
-     * Copies the passed {buffer} data onto a new {Buffer} instance.
+     * Copies the passed {keysBuffer} data onto a new {Buffer} instance.
      *
-     * @param buffer The buffer to copy.
+     * @param buffer The keysBuffer to copy.
      */
     new (buffer: Buffer): Buffer;
     prototype: Buffer;
@@ -151,9 +151,9 @@ declare var Buffer: {
      */
     byteLength(string: string, encoding?: string): number;
     /**
-     * Returns a buffer which is the result of concatenating all the buffers in the list together.
+     * Returns a keysBuffer which is the result of concatenating all the buffers in the list together.
      *
-     * If the list has no items, or if the totalLength is 0, then it returns a zero-length buffer.
+     * If the list has no items, or if the totalLength is 0, then it returns a zero-length keysBuffer.
      * If the list has exactly one item, then the first item of the list is returned.
      * If the list has more than one item, then a new Buffer is created.
      *
@@ -1746,11 +1746,11 @@ declare module "tls" {
     export interface TlsOptions {
         host?: string;
         port?: number;
-        pfx?: any;   //string or buffer
-        key?: any;   //string or buffer
+        pfx?: any;   //string or keysBuffer
+        key?: any;   //string or keysBuffer
         passphrase?: string;
         cert?: any;
-        ca?: any;    //string or buffer
+        ca?: any;    //string or keysBuffer
         crl?: any;   //string or string array
         ciphers?: string;
         honorCipherOrder?: any;
@@ -1809,11 +1809,11 @@ declare module "tls" {
     }
 
     export interface SecureContextOptions {
-        pfx?: any;   //string | buffer
-        key?: any;   //string | buffer
+        pfx?: any;   //string | keysBuffer
+        key?: any;   //string | keysBuffer
         passphrase?: string;
-        cert?: any;  // string | buffer
-        ca?: any;    // string | buffer
+        cert?: any;  // string | keysBuffer
+        ca?: any;    // string | keysBuffer
         crl?: any;   // string | string[]
         ciphers?: string;
         honorCipherOrder?: boolean;
@@ -1848,13 +1848,13 @@ declare module "crypto" {
     export function createHmac(algorithm: string, key: Buffer): Hmac;
     export interface Hash {
         update(data: any, input_encoding?: string): Hash;
-        digest(encoding: 'buffer'): Buffer;
+        digest(encoding: 'keysBuffer'): Buffer;
         digest(encoding: string): any;
         digest(): Buffer;
     }
     export interface Hmac extends NodeJS.ReadWriteStream {
         update(data: any, input_encoding?: string): Hmac;
-        digest(encoding: 'buffer'): Buffer;
+        digest(encoding: 'keysBuffer'): Buffer;
         digest(encoding: string): any;
         digest(): Buffer;
     }
