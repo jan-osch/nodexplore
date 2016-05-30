@@ -5,7 +5,7 @@ let _ = require('lodash');
 let async = require('async');
 let utils = require('./utils');
 
-const maxProblemSize = 100000;
+const maxProblemSize = 300000;
 
 class MasterSorer {
     constructor(workers) {
